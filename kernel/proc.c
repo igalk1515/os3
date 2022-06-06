@@ -13,10 +13,17 @@ struct proc proc[NPROC];
 struct proc *initproc;
 
 int nextpid = 1;
+int dbugFlag=0;
 struct spinlock pid_lock;
 
 extern void forkret(void);
 static void freeproc(struct proc *p);
+
+void printDbug(int flag){
+  if(flag){
+    printf("type is %d\n",flag);
+  }
+}
 
 extern char trampoline[]; // trampoline.S
 
@@ -282,6 +289,8 @@ fork(void)
   }
 
   // Copy user memory from parent to child.
+  printDbug(dbugFlag);
+  //here the magic start
   if(uvmcopy(p->pagetable, np->pagetable, p->sz) < 0){
     freeproc(np);
     release(&np->lock);
