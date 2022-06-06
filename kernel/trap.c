@@ -15,7 +15,7 @@ extern char trampoline[], uservec[], userret[];
 void kernelvec();
 
 extern int devintr();
-extern pte_t * walk(pagetable_t pagetable, uint64 va, int alloc); //TODO: new chnge
+extern pte_t * walk(pagetable_t pagetable, uint64 va, int alloc); 
 
 void
 trapinit(void)
@@ -51,11 +51,9 @@ usertrap(void)
     // save user program counter.
     p->trapframe->epc = r_sepc();
 //TODO:_----------------------------------------------------------------------------------------------- 
-    if(r_scause() == 13 || r_scause() == 15){
+    if(r_scause() == 15){// no need to take care of r_scause() == 13
         uint64 va = r_stval(); // va that caused tha trap
         if(cow(p->pagetable, va) != 0){
-            printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
-            printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
             p->killed = 1;
         }
     }

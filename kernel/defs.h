@@ -64,7 +64,7 @@ void*           kalloc(void);
 void            kfree(void *);
 void            kinit(void);
 void            changeCount(uint64 pa,int numer);
-int             get_reference_count(uint64 pa); //TODO
+int             getCount(uint64 pa); //TODO
 
 // log.c
 void            initlog(int, struct superblock*);

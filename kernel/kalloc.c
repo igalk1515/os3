@@ -9,9 +9,9 @@
 #include "riscv.h"
 #include "defs.h"
 
-extern uint64 cas(volatile void *addr, int expected, int newval); //TODO:new change
+extern uint64 cas(volatile void *addr, int expected, int newval); //TODO:
 
-#define NUM_PYS_PAGES ((PHYSTOP-KERNBASE) / PGSIZE) //TODO:new change
+#define NUM_PYS_PAGES ((PHYSTOP-KERNBASE) / PGSIZE) //TODO:
 void freerange(void *pa_start, void *pa_end);
 
 extern char end[]; // first address after kernel.
@@ -20,7 +20,7 @@ extern char end[]; // first address after kernel.
 struct {
     struct spinlock lock;
     struct run *freelist;
-    uint64 ref_count[NUM_PYS_PAGES]; //TODO:new change
+    uint64 ref_count[NUM_PYS_PAGES]; //TODO:
 } kmem;
 
 
@@ -33,7 +33,8 @@ void
 kinit()
 {
     initlock(&kmem.lock, "kmem");
-    memset(kmem.ref_count, 0, sizeof(kmem.ref_count)); //TODO:new change
+    // set all reference counts to zero
+    memset(kmem.ref_count, 0, sizeof(kmem.ref_count)); //TODO:
     freerange(end, (void*)PHYSTOP);
 }
 
@@ -43,7 +44,7 @@ freerange(void *pa_start, void *pa_end)
     char *p;
     p = (char*)PGROUNDUP((uint64)pa_start);
     for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE){
-        kmem.ref_count[(((uint64)p-KERNBASE) / PGSIZE)] = 1; //TODO:new change
+        kmem.ref_count[(((uint64)p-KERNBASE) / PGSIZE)] = 1; //TODO:
         kfree(p);
     }
 }
@@ -61,9 +62,9 @@ kfree(void *pa)
     if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
         panic("kfree");
 
-    changeCount((uint64)pa,b); //TODO:new change
-    if (get_reference_count((uint64)pa) > 0) //TODO:new change
-        return; //TODO:new change
+    changeCount((uint64)pa,b); //TODO:
+    if (getCount((uint64)pa) > 0) //TODO:
+        return; //TODO:
 
     // Fill with junk to catch dangling refs.
     memset(pa, 1, PGSIZE);
@@ -92,10 +93,10 @@ kalloc(void)
     release(&kmem.lock);
 
     if(r)
-        memset((char*)r, 5, PGSIZE); // fill with junk
+        memset((char*)r, 5, PGSIZE); // fill with junk and set the reference count of the newly allocated page to 1
 
     if(r)
-        changeCount((uint64)r,a); //TODO:new change
+        changeCount((uint64)r,a); //TODO:
 
     return (void*)r;
 }
@@ -106,11 +107,11 @@ page.
 
 */
 
-void changeCount(uint64 pa,int numer){ //TODO:new change
+void changeCount(uint64 pa,int numer){ //TODO:
     uint64 entry = (pa-KERNBASE) / PGSIZE;
     while(cas(kmem.ref_count + entry, kmem.ref_count[entry], kmem.ref_count[entry] + numer));
 }
 
-int get_reference_count(uint64 pa){ //TODO:new change
+int getCount(uint64 pa){ //TODO:new change
     return kmem.ref_count[(pa-KERNBASE) / PGSIZE];
 }

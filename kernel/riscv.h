@@ -14,7 +14,7 @@ r_mhartid()
 #define MSTATUS_MPP_S (1L << 11)
 #define MSTATUS_MPP_U (0L << 11)
 #define MSTATUS_MIE (1L << 3)    // machine-mode interrupt enable.
-#define PTE_COW (1L << 9)  //TODO:new change
+#define PTE_COW (1L << 9)  //TODO: reserved bits in supervisor program to signify cow page, 1 -> cow page
 
 static inline uint64
 r_mstatus()
@@ -350,7 +350,7 @@ sfence_vma()
 
 #define PTE2PA(pte) (((pte) >> 10) << 12)
 
-#define VA2PA(v) (((int) (v)) - KERNBASE) //TODO:new change
+#define VA2PA(v) (((int) (v)) - KERNBASE) //TODO:
 
 #define PTE_FLAGS(pte) ((pte) & 0x3FF)
 
